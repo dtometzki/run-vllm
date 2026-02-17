@@ -16,10 +16,10 @@ permissions:
 
 jobs:
   release:
-    runs-on: [blacksmith-8vcpu-ubuntu-2204, linux]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Clear space to remove unused folders
         run: |
@@ -40,14 +40,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: blacksmith docker layer cache
-        uses: useblacksmith/build-push-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v4
         with:
-          setup-only: true
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
       - name: Set environment variables
         run: |
-          echo "DOCKERHUB_REPO=${{ vars.DOCKERHUB_REPO || 'runpod' }}" >> $GITHUB_ENV
+          echo "DOCKERHUB_REPO=${{ vars.DOCKERHUB_REPO || 'dtometzki' }}" >> $GITHUB_ENV
           echo "DOCKERHUB_IMG=${{ vars.DOCKERHUB_IMG || 'worker-v1-vllm' }}" >> $GITHUB_ENV
           echo "HUGGINGFACE_ACCESS_TOKEN=${{ secrets.HUGGINGFACE_ACCESS_TOKEN }}" >> $GITHUB_ENV
 
@@ -84,3 +87,4 @@ jobs:
           else
             echo "Trigger: GitHub release (tag: ${{ github.ref_name }})"
           fi
+
