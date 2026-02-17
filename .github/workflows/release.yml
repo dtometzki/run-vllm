@@ -68,7 +68,7 @@ jobs:
           fi
 
       - name: Build and push the images to Docker Hub
-        uses: docker/bake-action@v2
+        uses: docker/bake-action@v4
         with:
           push: true
           set: |
@@ -87,4 +87,5 @@ jobs:
           else
             echo "Trigger: GitHub release (tag: ${{ github.ref_name }})"
           fi
+
 
