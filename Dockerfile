@@ -1,13 +1,13 @@
-FROM nvidia/cuda:12.8.0-base-ubuntu22.04 
+FROM nvidia/cuda:12.9.1-base-ubuntu22.04
 
 RUN apt-get update -y \
     && apt-get install -y python3-pip
 
-RUN ldconfig /usr/local/cuda-12.8/compat/
+RUN ldconfig /usr/local/cuda-12.9/compat/
 
-# Install vLLM with FlashInfer - use CUDA 12.8 PyTorch wheels (compatible with vLLM 0.15.0)
+# Install vLLM with FlashInfer - use CUDA 12.9 PyTorch wheels (compatible with vLLM 0.15.1)
 RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install "vllm[flashinfer]==0.15.1" --extra-index-url https://download.pytorch.org/whl/cu128
+    python3 -m pip install "vllm[flashinfer]==0.15.1" --extra-index-url https://download.pytorch.org/whl/cu129
 
 
 
@@ -41,6 +41,7 @@ ENV MODEL_NAME=$MODEL_NAME \
     # Prevent rayon thread pool panic in containers where ulimit -u < nproc
     # (tokenizers uses Rust's rayon which tries to spawn threads = CPU cores)
     TOKENIZERS_PARALLELISM=false \
+    VLLM_NIGHTLY=1
     RAYON_NUM_THREADS=4
 
 ENV PYTHONPATH="/:/vllm-workspace"
