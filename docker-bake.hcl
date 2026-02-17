@@ -1,9 +1,9 @@
 variable "DOCKERHUB_REPO" {
-  default = "runpod"
+  default = "dtometzki"
 }
 
 variable "DOCKERHUB_IMG" {
-  default = "worker-v1-vllm"
+  default = "run_vllm"
 }
 
 variable "RELEASE_VERSION" {
