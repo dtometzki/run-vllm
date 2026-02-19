@@ -16,10 +16,10 @@ permissions:
 
 jobs:
   release:
-    runs-on: [blacksmith-8vcpu-ubuntu-2204, linux]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Clear space to remove unused folders
         run: |
@@ -65,10 +65,12 @@ jobs:
           fi
 
       - name: Build and push the images to Docker Hub
-        uses: docker/bake-action@v2
+        uses: docker/bake-action@v5
         with:
           push: true
           set: |
+            *.cache-from=type=gha
+            *.cache-to=type=gha,mode=max
             *.args.DOCKERHUB_REPO=${{ env.DOCKERHUB_REPO }}
             *.args.DOCKERHUB_IMG=${{ env.DOCKERHUB_IMG }}
             *.args.RELEASE_VERSION=${{ env.RELEASE_VERSION }}
