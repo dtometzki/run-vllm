@@ -6,10 +6,16 @@
   "iconUrl": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/vllm-color.png",
   "config": {
     "runsOn": "GPU",
-    "containerDiskInGb": 150,
-    "gpuIds": "ADA_80_PRO,AMPERE_80",
+    "containerDiskInGb": 250,
+    "gpuIds": "ADA_80_PRO,AMPERE_80,HOPPER_80,ADA_24",
     "gpuCount": 1,
-    "allowedCudaVersions": ["12.9", "12.8", "12.5", "12.4", "12.1"],
+    "allowedCudaVersions": [
+      "12.9",
+      "12.8",
+      "12.5",
+      "12.4",
+      "12.1"
+    ],
     "presets": [
       {
         "name": "deepseek-ai/deepseek-r1-distill-llama-8b",
@@ -27,6 +33,15 @@
           "type": "huggingface",
           "description": "Hugging Face model name",
           "required": true
+        }
+      },
+      {
+        "key": "HF_TOKEN",
+        "input": {
+          "name": "Hugging Face Token",
+          "type": "string",
+          "description": "Required for downloading gated models like Llama-3 or Gemma-2.",
+          "advanced": false
         }
       },
       {
@@ -316,11 +331,26 @@
           "type": "string",
           "description": "Parser for reasoning-capable models (enables reasoning mode)",
           "options": [
-            { "label": "None", "value": "" },
-            { "label": "DeepSeek R1", "value": "deepseek_r1" },
-            { "label": "Qwen3", "value": "qwen3" },
-            { "label": "Granite", "value": "granite" },
-            { "label": "Hunyuan A13B", "value": "hunyuan_a13b" }
+            {
+              "label": "None",
+              "value": ""
+            },
+            {
+              "label": "DeepSeek R1",
+              "value": "deepseek_r1"
+            },
+            {
+              "label": "Qwen3",
+              "value": "qwen3"
+            },
+            {
+              "label": "Granite",
+              "value": "granite"
+            },
+            {
+              "label": "Hunyuan A13B",
+              "value": "hunyuan_a13b"
+            }
           ],
           "default": "",
           "advanced": true
@@ -331,7 +361,7 @@
         "input": {
           "name": "Tensor Parallel Size",
           "type": "number",
-          "description": "Number of GPUs to use for tensor parallelism.",
+          "description": "Number of GPUs to use for tensor parallelism. Must match the allocated number of GPUs (gpuCount).",
           "default": 1,
           "advanced": true
         }
@@ -342,6 +372,36 @@
           "name": "API Key",
           "type": "string",
           "description": "Secret key to secure the vLLM API endpoints.",
+          "advanced": true
+        }
+      },
+      {
+        "key": "KV_CACHE_DTYPE",
+        "input": {
+          "name": "KV Cache Data Type",
+          "type": "string",
+          "description": "Data type for the KV cache. Using fp8 saves massive VRAM for long contexts.",
+          "options": [
+            {
+              "label": "auto",
+              "value": "auto"
+            },
+            {
+              "label": "fp8",
+              "value": "fp8"
+            }
+          ],
+          "default": "auto",
+          "advanced": true
+        }
+      },
+      {
+        "key": "MAX_NUM_SEQS",
+        "input": {
+          "name": "Max Number of Sequences",
+          "type": "number",
+          "description": "Maximum number of sequences per iteration. Higher means better throughput but more VRAM usage.",
+          "default": 256,
           "advanced": true
         }
       }
