@@ -39,7 +39,7 @@
         "key": "HF_TOKEN",
         "input": {
           "name": "Hugging Face Token",
-          "type": "string",
+          "type": "secret",
           "description": "Required for downloading gated models like Llama-3 or Gemma-2.",
           "advanced": false
         }
@@ -370,7 +370,7 @@
         "key": "VLLM_API_KEY",
         "input": {
           "name": "API Key",
-          "type": "string",
+          "type": "secret",
           "description": "Secret key to secure the vLLM API endpoints.",
           "advanced": true
         }
