@@ -7,7 +7,7 @@
   "config": {
     "runsOn": "GPU",
     "containerDiskInGb": 250,
-    "gpuIds": "ADA_80_PRO,AMPERE_80,HOPPER_80,ADA_24",
+    "gpuIds": "AMPERE_48,AMPERE_80,HOPPER_80",
     "gpuCount": 1,
     "allowedCudaVersions": [
       "12.9",
