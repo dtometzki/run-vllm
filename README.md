@@ -59,6 +59,16 @@ Configure worker-vllm using environment variables:
 | `OPENAI_SERVED_MODEL_NAME_OVERRIDE` | Override served model name in API                 |                     | String                                                             |
 | `MAX_CONCURRENCY`                   | Maximum concurrent requests                       | 30                  | Integer                                                            |
 
+**Pass any vLLM engine arg** not listed above by prefixing it with `VLLM_`. The suffix maps directly to the vLLM `AsyncEngineArgs` field name (case-insensitive). For example:
+
+| Environment Variable      | vLLM Engine Arg          | Example Value |
+| ------------------------- | ------------------------ | ------------- |
+| `VLLM_RUNPOD_MAX_MODEL_LEN`      | `max_model_len`          | `4096`        |
+| `VLLM_RUNPOD_ENFORCE_EAGER`      | `enforce_eager`          | `true`        |
+| `VLLM_RUNPOD_ENABLE_CHUNKED_PREFILL` | `enable_chunked_prefill` | `true`    |
+
+Any `VLLM_RUNPOD_<ARG>` that matches a valid vLLM engine arg will be applied automatically. This lets you configure any vLLM option without waiting for explicit worker support.
+
 For the complete list of all available environment variables, examples, and detailed descriptions: **[Configuration](docs/configuration.md)**
 
 ## Option 2: Build Docker Image with Model Inside

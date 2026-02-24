@@ -28,6 +28,8 @@ All behaviour is controlled through environment variables:
 | `OPENAI_SERVED_MODEL_NAME_OVERRIDE` | Override served model name in API                 |                     | String                                                             |
 | `MAX_CONCURRENCY`                   | Maximum concurrent requests                       | 300                 | Integer                                                            |
 
+**Pass any vLLM engine arg** not listed above by prefixing it with `VLLM_RUNPOD_`. The suffix maps to the vLLM `AsyncEngineArgs` field name (case-insensitive). For example, `VLLM_RUNPOD_ENABLE_CHUNKED_PREFILL=true` sets `enable_chunked_prefill`. See the [vLLM engine args docs](https://docs.vllm.ai/en/latest/configuration/engine_args) for all available options.
+
 For complete configuration options, see the [full configuration documentation](https://github.com/runpod-workers/worker-vllm/blob/main/docs/configuration.md).
 
 ## API Usage

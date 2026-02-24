@@ -14,7 +14,7 @@ RENAME_ARGS_MAP = {
     "MAX_CONTEXT_LEN_TO_CAPTURE": "max_seq_len_to_capture"
 }
 
-VLLM_ENV_PREFIX = "VLLM_"
+VLLM_ENV_PREFIX = "VLLM_RUNPOD_"
 
 
 def _resolve_field_type(field_type: type) -> type:
@@ -70,10 +70,10 @@ def _convert_env_value_to_field_type(value: str, field_name: str, field_type: ty
 
 
 def _get_vllm_env_overrides() -> dict:
-    """Collect engine arg overrides from env vars with prefix VLLM_.
+    """Collect engine arg overrides from env vars with prefix VLLM_RUNPOD_.
 
-    Any env var VLLM_<ARG> maps to the engine arg <arg> (lowercase).
-    E.g. VLLM_MAX_MODEL_LEN=4096 -> max_model_len=4096.
+    Any env var VLLM_RUNPOD_<ARG> maps to the engine arg <arg> (lowercase).
+    E.g. VLLM_RUNPOD_MAX_MODEL_LEN=4096 -> max_model_len=4096.
     Only keys that exist on AsyncEngineArgs are applied; values are
     converted to the field type (int, float, bool, str, json for dict/list).
     """
@@ -93,12 +93,12 @@ def _get_vllm_env_overrides() -> dict:
             )
         except (ValueError, TypeError, json.JSONDecodeError) as e:
             logging.warning(
-                "Skip VLLM_ env override %s=%r: %s", key, value, e
+                "Skip VLLM_RUNPOD_ env override %s=%r: %s", key, value, e
             )
             continue
     if overrides:
         logging.info(
-            "Applying engine arg overrides from VLLM_ env vars: %s",
+            "Applying engine arg overrides from VLLM_RUNPOD_ env vars: %s",
             list(overrides.keys()),
         )
     return overrides
@@ -359,7 +359,7 @@ def get_engine_args():
     # Rename and match to vllm args
     args = match_vllm_args(args)
 
-    # Apply any VLLM_* env vars as overrides (e.g. VLLM_MAX_MODEL_LEN=4096 -> max_model_len=4096)
+    # Apply any VLLM_RUNPOD_* env vars as overrides (e.g. VLLM_RUNPOD_MAX_MODEL_LEN=4096 -> max_model_len=4096)
     args.update(_get_vllm_env_overrides())
 
     if args.get("load_format") == "bitsandbytes":
