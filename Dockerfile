@@ -38,14 +38,12 @@ ENV PYTHONPATH="/:/vllm-workspace"
 
 RUN if [ "${VLLM_NIGHTLY}" = "true" ]; then \
     python3 -m pip install -U pip && \
-    # vLLM nightly passend zu cu129
     pip install -U --pre vllm \
       --extra-index-url https://wheels.vllm.ai/nightly/cu129 && \
-    # optional: FlashInfer + Cache (reduziert nvcc-jit bei FP8)
     pip install -U flashinfer-python flashinfer-cubin && \
-    apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
     pip install git+https://github.com/huggingface/transformers.git; \
 fi
+
 
 # Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
 COPY builder/requirements.txt /requirements.txt
