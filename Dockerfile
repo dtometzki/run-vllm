@@ -5,6 +5,11 @@ RUN apt-get update -y \
 
 RUN ldconfig /usr/local/cuda-12.9/compat/
 
+# Install vLLM with FlashInfer - use CUDA 12.8 PyTorch wheels (compatible with vLLM 0.15.1)
+RUN if [ "${VLLM_NIGHTLY}" = "false" ]; then \
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install -U vllm --extra-index-url https://download.pytorch.org/whl/cu129; \
+fi
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
@@ -36,14 +41,15 @@ ENV MODEL_NAME=$MODEL_NAME \
 
 ENV PYTHONPATH="/:/vllm-workspace"
 
-RUN if [ "${VLLM_NIGHTLY}" = "true" ]; then \
-    python3 -m pip install -U pip && \
-    pip install -U --pre vllm \
-      --extra-index-url https://wheels.vllm.ai/nightly/cu129 && \
-    pip install -U flashinfer-python flashinfer-cubin && \
-    pip install git+https://github.com/huggingface/transformers.git; \
-fi
-
+RUN python3 -m pip install -U pip && \
+    # vLLM je nach Schalter
+    if [ "${VLLM_NIGHTLY}" = "true" ]; then \
+      pip install -U --pre vllm \
+        --extra-index-url https://wheels.vllm.ai/nightly/cu128 ; \
+    else \
+      pip install -U "vllm[flashinfer]" \
+        --extra-index-url https://download.pytorch.org/whl/cu128 ; \
+    fi
 
 # Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
 COPY builder/requirements.txt /requirements.txt
