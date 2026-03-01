@@ -5,12 +5,6 @@ RUN apt-get update -y \
 
 RUN ldconfig /usr/local/cuda-12.9/compat/
 
-# Install vLLM with FlashInfer - use CUDA 12.8 PyTorch wheels (compatible with vLLM 0.15.1)
-RUN if [ "${VLLM_NIGHTLY}" = "false" ]; then \
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install -U vllm --extra-index-url https://download.pytorch.org/whl/cu129; \
-fi
-
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
 ARG TOKENIZER_NAME=""
