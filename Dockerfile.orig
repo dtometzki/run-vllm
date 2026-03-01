@@ -5,6 +5,11 @@ RUN apt-get update -y \
 
 RUN ldconfig /usr/local/cuda-12.9/compat/
 
+# Install vLLM with FlashInfer - use CUDA 12.8 PyTorch wheels (compatible with vLLM 0.15.1)
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install "vllm[flashinfer]==0.16.0" --extra-index-url https://download.pytorch.org/whl/cu129
+
+
 
 # Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
 COPY builder/requirements.txt /requirements.txt
@@ -42,21 +47,10 @@ ENV MODEL_NAME=$MODEL_NAME \
 ENV PYTHONPATH="/:/vllm-workspace"
 
 RUN if [ "${VLLM_NIGHTLY}" = "true" ]; then \
-    python3 -m pip install -U pip && \
-    # Torch passend zu CUDA 12.9 (cu129)
-    pip install -U --pre torch torchvision torchaudio \
-      --index-url https://download.pytorch.org/whl/nightly/cu129 && \
-    # vLLM nightly passend zu cu129
-    pip install -U --pre vllm \
-      --extra-index-url https://wheels.vllm.ai/nightly/cu129 && \
-    # optional: FlashInfer + Cache (reduziert nvcc-jit bei FP8)
-    pip install -U flashinfer-python flashinfer-cubin && \
-    pip install -U --pre flashinfer-jit-cache \
-      --index-url https://flashinfer.ai/whl/nightly/cu129/ && \
+    pip install -U vllm --pre --index-url https://pypi.org/simple --extra-index-url https://wheels.vllm.ai/nightly && \
     apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
     pip install git+https://github.com/huggingface/transformers.git; \
 fi
-
 
 COPY src /src
 RUN --mount=type=secret,id=HF_TOKEN,required=false \
