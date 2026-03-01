@@ -6,11 +6,6 @@ RUN apt-get update -y \
 RUN ldconfig /usr/local/cuda-12.9/compat/
 
 
-# Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
-COPY builder/requirements.txt /requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --upgrade -r /requirements.txt
-
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
 ARG TOKENIZER_NAME=""
@@ -43,19 +38,19 @@ ENV PYTHONPATH="/:/vllm-workspace"
 
 RUN if [ "${VLLM_NIGHTLY}" = "true" ]; then \
     python3 -m pip install -U pip && \
-    # Torch passend zu CUDA 12.9 (cu129)
-    pip install -U --pre torch torchvision torchaudio \
-      --index-url https://download.pytorch.org/whl/nightly/cu129 && \
     # vLLM nightly passend zu cu129
     pip install -U --pre vllm \
       --extra-index-url https://wheels.vllm.ai/nightly/cu129 && \
     # optional: FlashInfer + Cache (reduziert nvcc-jit bei FP8)
     pip install -U flashinfer-python flashinfer-cubin && \
-    pip install -U --pre flashinfer-jit-cache \
-      --index-url https://flashinfer.ai/whl/nightly/cu129/ && \
     apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
     pip install git+https://github.com/huggingface/transformers.git; \
 fi
+
+# Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
+COPY builder/requirements.txt /requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --upgrade -r /requirements.txt
 
 
 COPY src /src
