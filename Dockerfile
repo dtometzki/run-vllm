@@ -39,7 +39,9 @@ RUN python3 -m pip install -U pip && \
     # vLLM je nach Schalter
     if [ "${VLLM_NIGHTLY}" = "true" ]; then \
       pip install -U --pre vllm \
-        --extra-index-url https://wheels.vllm.ai/nightly/cu128 ; \
+        --extra-index-url https://wheels.vllm.ai/nightly/cu128 && \
+      apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
+      pip install git+https://github.com/huggingface/transformers.git; \
     else \
       pip install -U "vllm[flashinfer]" \
         --extra-index-url https://download.pytorch.org/whl/cu128 ; \
