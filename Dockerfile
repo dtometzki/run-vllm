@@ -1,7 +1,10 @@
 FROM nvidia/cuda:12.9.1-base-ubuntu22.04 
 
-RUN apt-get update -y \
-    && apt-get install -y python3-pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-venv \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN ldconfig /usr/local/cuda-12.9/compat/
 
@@ -34,18 +37,22 @@ ENV MODEL_NAME=$MODEL_NAME \
     RAYON_NUM_THREADS=4
 
 ENV PYTHONPATH="/:/vllm-workspace"
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
-# vLLM je nach Schalter
-RUN python3 -m pip install --no-cache-dir -U pip && \
-    if [ "${VLLM_NIGHTLY}" = "true" ]; then \
-      pip install --no-cache-dir -U vllm --pre \
-        --extra-index-url https://wheels.vllm.ai/nightly ;\
-      apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
-      pip install --no-cache-dir git+https://github.com/huggingface/transformers.git; \
+# vLLM je nach Schalter (ohne pip-Update)
+RUN if [ "${VLLM_NIGHTLY}" = "true" ]; then \
+        python3 -m pip install --no-cache-dir -U vllm --pre \
+          --extra-index-url https://wheels.vllm.ai/nightly/cu130 \
+          --break-system-packages; \
+        apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/* && \
+        python3 -m pip install --no-cache-dir git+https://github.com/huggingface/transformers.git \
+          --break-system-packages; \
     else \
-      pip install --no-cache-dir -U "vllm[flashinfer]" \
-        --extra-index-url https://download.pytorch.org/whl/cu128 ; \
+        python3 -m pip install --no-cache-dir -U "vllm[flashinfer]" \
+          --extra-index-url https://download.pytorch.org/whl/cu130 \
+          --break-system-packages; \
     fi
+
 
 # Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
 COPY builder/requirements.txt /requirements.txt
