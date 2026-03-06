@@ -3,6 +3,7 @@
   "description": "Deploy OpenAI-Compatible Blazing-Fast LLM Endpoints powered by vLLM",
   "type": "serverless",
   "category": "language",
+  "endpointType": "LB",
   "iconUrl": "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/vllm-color.png",
   "config": {
     "runsOn": "GPU",
